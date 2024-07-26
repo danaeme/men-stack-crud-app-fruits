@@ -25,8 +25,10 @@ app.get('/', async (req, res) => {
 })
 
 //GET '/fruits'
-app.get('/fruits', (req, res) => {
-    res.send('Welcome to the index page')
+app.get('/fruits', async (req, res) => {
+    const allFruits = await Fruit.find()
+    console.log(allFruits)
+    res.render("fruits/index.ejs", { fruits: allFruits })
 })
 
 // GET '/fruits/new
@@ -34,20 +36,21 @@ app.get('/fruits/new', (req, res) => {
     res.render('fruits/new.ejs')
 })
 
-//POST '/fruits'
-app.post('/fruits', async (req, res) => {
-    if (req.body.isReadyToEat === 'on') {
-        req.body.isReadyToEat = true
-    }
-    else {
-        req.body.isReadyToEat = false
-    }
-    console.log(req.body)
-    res.redirect('/fruits/new')
-
-    await Fruit.create(req.body)
-
+app.get('/fruits/:fruitID', async (req, res) => {
+  const foundFruit = await Fruit.findById(req.params.fruitID)
+  res.render('fruits/show.ejs', {fruit: foundFruit})
 })
+
+//POST '/fruits'
+app.post("/fruits", async (req, res) => {
+    if (req.body.isReadyToEat === "on") {
+      req.body.isReadyToEat = true;
+    } else {
+      req.body.isReadyToEat = false;
+    }
+    await Fruit.create(req.body);
+    res.redirect("/fruits"); // redirect to index fruits
+  });
 
 app.listen(3000, () => {
     console.log('Listening on port 3000')
